@@ -1,0 +1,48 @@
+{
+  "mode": "warm",
+  "label": "gemma4_e4b",
+  "model": "default",
+  "runs": [
+    {
+      "question": "Q1",
+      "main": {
+        "text": "[redacted]",
+        "prompt_tokens": 15621,
+        "cached_tokens": 15584,
+        "prompt_s": 0.273,
+        "wall_s": 1.7783606052398682
+      },
+      "extension": {
+        "text": "[redacted]",
+        "prompt_tokens": 15700,
+        "cached_tokens": 15616,
+        "prompt_s": 0.519,
+        "wall_s": 0.9002079963684082
+      }
+    },
+    {
+      "question": "Q2",
+      "main": {
+        "text": "[redacted]",
+        "prompt_tokens": 15617,
+        "cached_tokens": 15584,
+        "prompt_s": 0.272,
+        "wall_s": 1.2977192401885986
+      },
+      "extension": {
+        "text": "[redacted]",
+        "prompt_tokens": 15674,
+        "cached_tokens": 15616,
+        "prompt_s": 0.355,
+        "wall_s": 0.9422552585601807
+      }
+    }
+  ],
+  "build": {
+    "text": "",
+    "prompt_tokens": 15601,
+    "cached_tokens": 0,
+    "prompt_s": 53.94,
+    "wall_s": 54.016645669937134
+  }
+}

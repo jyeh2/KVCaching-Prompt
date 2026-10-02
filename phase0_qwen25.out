@@ -1,0 +1,14 @@
+prefix: 15600 tokens from 10 files
+build: 15600 tok in 82.9s | save: 15600 tok, 1007 ms, 549 MiB on disk
+
+Q (19 tok): [redacted]
+  cold: processed 15619 tok, time to first token 83.3s
+  warm: restore 280 ms (15600 tok) + processed 19 tok in 174 ms -> time to first token 0.45s
+  outputs match: False
+   cold: [redacted]
+   warm: [redacted]
+
+Q (15 tok): [redacted]
+  cold: processed 15615 tok, time to first token 83.8s
+  warm: restore 300 ms (15600 tok) + processed 15 tok in 136 ms -> time to first token 0.44s
+  outputs match: True

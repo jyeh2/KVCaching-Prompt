@@ -1,0 +1,27 @@
+{
+  "mode": "cold",
+  "label": "gemma4_e4b",
+  "model": "default",
+  "runs": [
+    {
+      "question": "Q1",
+      "main": {
+        "text": "[redacted]",
+        "prompt_tokens": 15621,
+        "cached_tokens": 0,
+        "prompt_s": 54.31,
+        "wall_s": 55.85438585281372
+      }
+    },
+    {
+      "question": "Q2",
+      "main": {
+        "text": "[redacted]",
+        "prompt_tokens": 15617,
+        "cached_tokens": 0,
+        "prompt_s": 54.517,
+        "wall_s": 55.59155774116516
+      }
+    }
+  ]
+}

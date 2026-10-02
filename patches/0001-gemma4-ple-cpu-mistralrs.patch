@@ -1,0 +1,70 @@
+From 37d5d35478392be0a86817e802c243d346ca1fe3 Mon Sep 17 00:00:00 2001
+From: jyeh2 <yehjames526@gmail.com>
+Date: Mon, 28 Sep 2026 01:36:44 +0000
+Subject: [PATCH] gemma4: optionally keep the per-layer embedding table in host
+ memory
+
+Gemma 4 E4B's per-layer embedding (PLE) table is ~1.8 GiB at Q5_K and is only
+ever read by token ID. MISTRALRS_GEMMA4_PLE_CPU=1 loads it on the CPU (as
+llama.cpp does) and copies only the gathered rows to the model device. On an
+8 GB card this frees ~1.85 GB, enough for the paged-attention KV pool and so
+chunked prefill of long prompts. Default behavior is unchanged.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../src/vision_models/gemma4/text.rs          | 22 ++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/mistralrs-core/src/vision_models/gemma4/text.rs b/mistralrs-core/src/vision_models/gemma4/text.rs
+index 3c61212..6242d71 100644
+--- a/mistralrs-core/src/vision_models/gemma4/text.rs
++++ b/mistralrs-core/src/vision_models/gemma4/text.rs
+@@ -48,6 +48,10 @@ fn gemma4_moe_weight_prefix(vb: &ShardedVarBuilder) -> &'static str {
+     }
+ }
+ 
++fn ple_on_cpu() -> bool {
++    std::env::var("MISTRALRS_GEMMA4_PLE_CPU").is_ok_and(|v| v == "1")
++}
++
+ macro_rules! is_sliding {
+     ($layer_idx:expr, $cfg:expr) => {
+         $cfg.layer_types[$layer_idx] == "sliding_attention"
+@@ -1737,13 +1741,19 @@ impl TextModel {
+         let ple_vocab = cfg.vocab_size_per_layer_input.unwrap_or(cfg.vocab_size);
+         let (embed_tokens_per_layer, per_layer_model_projection, per_layer_projection_norm) =
+             if ple_dim > 0 {
++                // The PLE table is a pure row lookup and is large (~1.8 GiB at Q5_K for E4B).
++                // MISTRALRS_GEMMA4_PLE_CPU=1 keeps it in host memory, as llama.cpp does, so
++                // small GPUs keep room for the KV cache; only the gathered rows are copied over.
++                let ple_vb = vb_m.pp("embed_tokens_per_layer");
++                let ple_vb = if ple_on_cpu() {
++                    ple_vb.set_device(Device::Cpu)
++                } else {
++                    mapper.set_nm_device(ple_vb, normal_loading_metadata.loading_isq)
++                };
+                 let ple_emb = embedding(
+                     ple_vocab,
+                     cfg.num_hidden_layers * ple_dim,
+-                    mapper.set_nm_device(
+-                        vb_m.pp("embed_tokens_per_layer"),
+-                        normal_loading_metadata.loading_isq,
+-                    ),
++                    ple_vb,
+                     &cfg.quantization_config,
+                 )?;
+ 
+@@ -1968,7 +1978,9 @@ impl TextModel {
+         let (b, seq, _) = inputs_embeds.dims3()?;
+ 
+         // 1. Token-level per-layer embeddings: [b, seq, num_layers * ple_dim]
+-        let embedded = ple_emb.embedding_forward(ple_input_ids, self.dtype)?;
++        let embedded = ple_emb
++            .embedding_forward(ple_input_ids, self.dtype)?
++            .to_device(inputs_embeds.device())?;
+         // Scale by sqrt(ple_dim)
+         let embedded = (embedded * (ple_dim as f64).sqrt())?;
+         // Reshape to [b, seq, num_layers, ple_dim]
+-- 
+2.34.1
+

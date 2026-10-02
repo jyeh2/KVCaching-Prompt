@@ -1,0 +1,48 @@
+{
+  "prefix_tokens": 15600,
+  "runs": [
+    {
+      "question_tokens": 20,
+      "cold": {
+        "prompt_n": 15620,
+        "prompt_ms": 118729.766,
+        "ttft_s": 118.729766,
+        "wall_s": 121.0283088684082
+      },
+      "warm": {
+        "restore_ms": 169.081,
+        "n_restored": 15600,
+        "prompt_n": 20,
+        "prompt_ms": 172.02,
+        "ttft_s": 0.341101,
+        "wall_s": 1.8822481632232666
+      },
+      "outputs_match": false,
+      "cold_text": "[redacted]",
+      "warm_text": "[redacted]"
+    },
+    {
+      "question_tokens": 16,
+      "cold": {
+        "prompt_n": 15616,
+        "prompt_ms": 119451.312,
+        "ttft_s": 119.451312,
+        "wall_s": 121.0241904258728
+      },
+      "warm": {
+        "restore_ms": 168.917,
+        "n_restored": 15600,
+        "prompt_n": 16,
+        "prompt_ms": 122.99,
+        "ttft_s": 0.29190699999999997,
+        "wall_s": 1.2938499450683594
+      },
+      "outputs_match": true,
+      "cold_text": "[redacted]",
+      "warm_text": "[redacted]"
+    }
+  ],
+  "build_s": 118.37791657447815,
+  "save_ms": 505.43,
+  "snapshot_mib": 263.9944877624512
+}
